@@ -1,5 +1,6 @@
 const { default: mongoose } = require('mongoose');
 const Cards = require('../models/cards');
+const { NOT_FOUND, CAST_ERROR } = require('../constants');
 
 module.exports.getCard = (req, res) => {
   Cards.find({})
@@ -25,15 +26,15 @@ module.exports.createCard = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   Cards.findByIdAndRemove(req.params.cardId)
-    .orFail(new Error('NotFound'))
+    .orFail(new Error(NOT_FOUND))
     .then((card) => {
       res.status(200).send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === CAST_ERROR) {
         return res.status(400).send({ message: 'Переданы некорректные данные карточки' });
       }
-      if (err.message === 'NotFound') {
+      if (err.message === NOT_FOUND) {
         return res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
       }
       return res.status(500).send({ message: err.message });
@@ -42,15 +43,15 @@ module.exports.deleteCard = (req, res) => {
 
 module.exports.likeCard = (req, res) => {
   Cards.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
-    .orFail(new Error('NotFound'))
+    .orFail(new Error(NOT_FOUND))
     .then((card) => {
       res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === CAST_ERROR) {
         return res.status(400).send({ message: 'Переданы некорректные данные для постановки лайка' });
       }
-      if (err.message === 'NotFound') {
+      if (err.message === NOT_FOUND) {
         return res.status(404).send({ message: 'Передан несуществующий _id карточки' });
       }
       return res.status(500).send({ message: err.message });
@@ -59,15 +60,15 @@ module.exports.likeCard = (req, res) => {
 
 module.exports.dislikeCard = (req, res) => {
   Cards.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
-    .orFail(new Error('NotFound'))
+    .orFail(new Error(NOT_FOUND))
     .then((card) => {
       res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === CAST_ERROR) {
         return res.status(400).send({ message: 'Переданы некорректные данные для снятии лайка' });
       }
-      if (err.message === 'NotFound') {
+      if (err.message === NOT_FOUND) {
         return res.status(404).send({ message: 'Передан несуществующий _id карточки' });
       }
       return res.status(500).send({ message: err.message });
