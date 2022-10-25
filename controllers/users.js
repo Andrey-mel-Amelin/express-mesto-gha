@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const Users = require('../models/users');
-const { NOT_FOUND, CAST_ERROR } = require('../constants');
+const { NOT_FOUND, CAST_ERROR, JWT_SECRET } = require('../constants');
 
 module.exports.getUsers = (req, res) => {
   Users.find({})
@@ -11,7 +13,7 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUser = (req, res) => {
-  Users.findById(req.params.userId)
+  Users.findById(req.user._id)
     .orFail(new Error(NOT_FOUND))
     .then((user) => {
       res.status(200).send({ data: user });
@@ -22,19 +24,6 @@ module.exports.getUser = (req, res) => {
       }
       if (err.message === NOT_FOUND) {
         return res.status(404).send({ message: 'Запрашиваемый пользователь не найден' });
-      }
-      return res.status(500).send({ message: err.message });
-    });
-};
-
-module.exports.createUser = (req, res) => {
-  Users.create(req.body)
-    .then((user) => {
-      res.status(200).send(user);
-    })
-    .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя' });
       }
       return res.status(500).send({ message: err.message });
     });
@@ -69,6 +58,59 @@ module.exports.updateAvatar = (req, res) => {
       }
       if (err.message === NOT_FOUND) {
         return res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
+      }
+      return res.status(500).send({ message: err.message });
+    });
+};
+
+module.exports.createUser = (req, res) => {
+  const { email, password } = req.body;
+  bcrypt
+    .hash(password, 10)
+    .then((hash) => Users.create({
+      email,
+      password: hash,
+    }))
+    .then((user) => {
+      res.status(200).send(user);
+    })
+    .catch((err) => {
+      if (err instanceof mongoose.Error.ValidationError) {
+        return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя' });
+      }
+      if (err.code === 11000) {
+        return res.status(450).send({ message: 'Email занят' });
+      }
+      return res.status(500).send({ message: err.message });
+    });
+};
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  Users.findOne({ email })
+    .select('password')
+    .orFail(new Error(NOT_FOUND))
+    .then((user) => {
+      if (!user) {
+        return res.status(401).send({ message: 'Неправильные почта или пароль' });
+      }
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET);
+      res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7 });
+      return bcrypt.compare(password, user.password);
+    })
+    .then((matched) => {
+      if (!matched) {
+        return res.status(401).send({ message: 'Неправильные почта или пароль' });
+      }
+      return res.status(200).send({ message: 'Пользователь авторизован' });
+    })
+    .catch((err) => {
+      if (err instanceof mongoose.Error.ValidationError) {
+        return res.status(400).send({ message: ' Переданы некорректные данные при авторизации' });
+      }
+      if (err.message === NOT_FOUND) {
+        return res.status(404).send({ message: 'Пользователь с указанным email не найден' });
       }
       return res.status(500).send({ message: err.message });
     });
