@@ -35,6 +35,28 @@ module.exports.login = (req, res, next) => {
     });
 };
 
+module.exports.createUser = (req, res, next) => {
+  const { email, password } = req.body;
+  bcrypt
+    .hash(password, 10)
+    .then((hash) => Users.create({
+      email,
+      password: hash,
+    }))
+    .then((user) => {
+      res.status(200).send(user);
+    })
+    .catch((err) => {
+      if (err.message === VALIDATION_ERROR) {
+        return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя' });
+      }
+      if (err.code === 11000) {
+        return res.status(409).send({ message: 'Пользователь с таким email уже существует' });
+      }
+      return next();
+    });
+};
+
 module.exports.getUsers = (req, res, next) => {
   Users.find({})
     .then((users) => res.status(200).send(users))
@@ -53,28 +75,6 @@ module.exports.getUser = (req, res, next) => {
       }
       if (err.message === NOT_FOUND) {
         return res.status(404).send({ message: 'Запрашиваемый пользователь не найден' });
-      }
-      return next();
-    });
-};
-
-module.exports.createUser = (req, res, next) => {
-  const { email, password } = req.body;
-  bcrypt
-    .hash(password, 10)
-    .then((hash) => Users.create({
-      email,
-      password: hash,
-    }))
-    .then((user) => {
-      res.status(200).send(user);
-    })
-    .catch((err) => {
-      if (err.message === VALIDATION_ERROR) {
-        return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя' });
-      }
-      if (err.code === 11000) {
-        return res.status(409).send({ message: 'Пользователь с таким email уже существует' });
       }
       return next();
     });
