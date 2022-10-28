@@ -3,9 +3,9 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Users = require('../models/users');
 const {
+  JWT_SECRET,
   NOT_FOUND,
   CAST_ERROR,
-  JWT_SECRET,
   ERROR_EMAIL_OR_PASSWORD,
   VALIDATION_ERROR,
 } = require('../constants');
@@ -36,16 +36,25 @@ module.exports.login = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
-  const { email, password } = req.body;
+  const {
+    email,
+    password,
+    name,
+    about,
+    avatar,
+  } = req.body;
+
   bcrypt
     .hash(password, 10)
     .then((hash) => Users.create({
       email,
       password: hash,
+      name,
+      about,
+      avatar,
     }))
-    .then((user) => {
-      res.status(200).send(user);
-    })
+    .then((user) => Users.findById(user._id))
+    .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.message === VALIDATION_ERROR) {
         return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя' });
@@ -67,7 +76,7 @@ module.exports.getUser = (req, res, next) => {
   Users.findById(req.params.userId || req.user._id)
     .orFail(new Error(NOT_FOUND))
     .then((user) => {
-      res.status(200).send({ data: user });
+      res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === CAST_ERROR) {
