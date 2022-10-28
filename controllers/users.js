@@ -7,7 +7,6 @@ const {
   NOT_FOUND,
   CAST_ERROR,
   ERROR_EMAIL_OR_PASSWORD,
-  VALIDATION_ERROR,
 } = require('../constants');
 
 module.exports.login = (req, res, next) => {
@@ -22,9 +21,6 @@ module.exports.login = (req, res, next) => {
         .send({ message: 'Пользователь успешно авторизирован' });
     })
     .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(400).send({ message: ' Переданы некорректные данные при авторизации' });
-      }
       if (err.message === NOT_FOUND) {
         return res.status(401).send({ message: 'Пользователя с таким email не существует' });
       }
@@ -56,9 +52,6 @@ module.exports.createUser = (req, res, next) => {
     .then((user) => Users.findById(user._id))
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.message === VALIDATION_ERROR) {
-        return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя' });
-      }
       if (err.code === 11000) {
         return res.status(409).send({ message: 'Пользователь с таким email уже существует' });
       }
@@ -96,9 +89,6 @@ module.exports.updateUser = (req, res, next) => {
       res.status(200).send(user);
     })
     .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля' });
-      }
       if (err.message === NOT_FOUND) {
         return res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
       }
@@ -113,9 +103,6 @@ module.exports.updateAvatar = (req, res, next) => {
       res.status(200).send(user);
     })
     .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(400).send({ message: ' Переданы некорректные данные при обновлении аватара' });
-      }
       if (err.message === NOT_FOUND) {
         return res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
       }
