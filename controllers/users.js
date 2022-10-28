@@ -1,11 +1,9 @@
-const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Users = require('../models/users');
 const {
   JWT_SECRET,
   NOT_FOUND,
-  CAST_ERROR,
   ERROR_EMAIL_OR_PASSWORD,
 } = require('../constants');
 
@@ -72,9 +70,6 @@ module.exports.getUser = (req, res, next) => {
       res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === CAST_ERROR) {
-        return res.status(400).send({ message: 'Переданы некорректные данные при поиске пользователя' });
-      }
       if (err.message === NOT_FOUND) {
         return res.status(404).send({ message: 'Запрашиваемый пользователь не найден' });
       }
