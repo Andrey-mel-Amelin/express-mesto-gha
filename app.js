@@ -4,10 +4,11 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 const { validAuthName } = require('./middlewares/joiValidation');
+const NotFoundErrorHandler = require('./errorsHandlers/NotFoundErrorHandler');
 
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
-const errorHandler = require('./middlewares/errorHandler');
+const centralizedErrorHandler = require('./middlewares/centralizedErrorHandler');
 
 const { PORT = 3000, MONGO_URL = 'mongodb://localhost:27017/mestodb' } = process.env;
 
@@ -28,10 +29,10 @@ app.use(auth);
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
-app.use((req, res) => {
-  res.status(404).send({ message: 'Некорректный запрос' });
+app.use((req, res, next) => {
+  next(new NotFoundErrorHandler('Некорректный запрос'));
 });
 
 app.use(errors());
-app.use(errorHandler);
+app.use(centralizedErrorHandler);
 app.listen(PORT);
