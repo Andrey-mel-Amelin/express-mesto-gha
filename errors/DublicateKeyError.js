@@ -1,4 +1,4 @@
-class DublicateKeyErrorHandler extends Error {
+class DublicateKeyError extends Error {
   constructor(message) {
     super(message);
     this.errorMessage = message;
@@ -6,4 +6,4 @@ class DublicateKeyErrorHandler extends Error {
   }
 }
 
-module.exports = DublicateKeyErrorHandler;
+module.exports = DublicateKeyError;

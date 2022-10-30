@@ -8,10 +8,10 @@ const {
   VALIDATION_ERROR,
   CAST_ERROR,
 } = require('../constants');
-const DublicateKeyErrorHandler = require('../errorsHandlers/DublicateKeyErrorHandler');
-const NotFoundErrorHandler = require('../errorsHandlers/NotFoundErrorHandler');
-const UnauthorizedErrorHandler = require('../errorsHandlers/UnauthorizedErrorHandler');
-const BadReqErrorHandler = require('../errorsHandlers/BadReqErrorHandler');
+const DublicateKeyError = require('../errors/DublicateKeyError');
+const NotFoundError = require('../errors/NotFoundError');
+const UnauthorizedError = require('../errors/UnauthorizedError');
+const BadReqError = require('../errors/BadReqError');
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
@@ -26,7 +26,7 @@ module.exports.login = (req, res, next) => {
     })
     .catch((err) => {
       if (err.message === ERROR_EMAIL_OR_PASSWORD) {
-        return next(new UnauthorizedErrorHandler(err.message));
+        return next(new UnauthorizedError(err.message));
       }
       return next(err);
     });
@@ -54,10 +54,10 @@ module.exports.createUser = (req, res, next) => {
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.message === VALIDATION_ERROR) {
-        return next(new BadReqErrorHandler('Переданы некорректные данные при создании пользователя.'));
+        return next(new BadReqError('Переданы некорректные данные при создании пользователя.'));
       }
       if (err.code === 11000) {
-        return next(new DublicateKeyErrorHandler('Пользователь с таким email уже существует.'));
+        return next(new DublicateKeyError('Пользователь с таким email уже существует.'));
       }
       return next(err);
     });
@@ -77,10 +77,10 @@ module.exports.getUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === CAST_ERROR) {
-        next(new BadReqErrorHandler('Переданы некорректный _id для поиска пользователя.'));
+        next(new BadReqError('Переданы некорректный _id для поиска пользователя.'));
       }
       if (err.message === NOT_FOUND) {
-        return next(new NotFoundErrorHandler('Запрашиваемый пользователь не найден.'));
+        return next(new NotFoundError('Запрашиваемый пользователь не найден.'));
       }
       return next(err);
     });
@@ -94,10 +94,10 @@ module.exports.updateUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.message === VALIDATION_ERROR) {
-        return next(new BadReqErrorHandler('Переданы некорректные данные при обновлении пользователя.'));
+        return next(new BadReqError('Переданы некорректные данные при обновлении пользователя.'));
       }
       if (err.message === NOT_FOUND) {
-        return next(new NotFoundErrorHandler('Пользователь с указанным _id не найден.'));
+        return next(new NotFoundError('Пользователь с указанным _id не найден.'));
       }
       return next(err);
     });
@@ -111,10 +111,10 @@ module.exports.updateAvatar = (req, res, next) => {
     })
     .catch((err) => {
       if (err.message === VALIDATION_ERROR) {
-        return next(new BadReqErrorHandler('Переданы некорректные данные при обновлении аватара пользователя.'));
+        return next(new BadReqError('Переданы некорректные данные при обновлении аватара пользователя.'));
       }
       if (err.message === NOT_FOUND) {
-        return next(new NotFoundErrorHandler('Пользователь с указанным _id не найден.'));
+        return next(new NotFoundError('Пользователь с указанным _id не найден.'));
       }
       return next(err);
     });
