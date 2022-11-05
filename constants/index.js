@@ -11,6 +11,7 @@ const allowedCors = [
   'http://amelin.mesto.backend.nomoredomains.icu',
   'http://127.0.0.1/',
   'http://localhost:3000/',
+  'localhost:3000',
 ];
 
 module.exports = {
