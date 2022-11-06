@@ -1,4 +1,11 @@
-const { allowedCors } = require('../constants');
+const allowedCors = [
+  'https://amelin.mesto.nomoredomains.icu,',
+  'http://amelin.mesto.nomoredomains.icu,',
+  'https://localhost:3000',
+  'http://localhost:3000',
+  'https://127.0.0.1:3000',
+  'http://127.0.0.1:3000',
+];
 
 module.exports = (req, res, next) => {
   const { origin } = req.headers;
