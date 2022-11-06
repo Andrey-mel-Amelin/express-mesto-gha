@@ -78,8 +78,8 @@ module.exports.getUsers = (req, res, next) => {
 module.exports.getUser = (req, res, next) => {
   Users.findById(req.params.userId || req.user._id)
     .orFail(new Error(NOT_FOUND))
-    .then((user) => {
-      res.status(200).send(user);
+    .then(() => {
+      res.status(200).send(req.user);
     })
     .catch((err) => {
       if (err.name === CAST_ERROR) {
