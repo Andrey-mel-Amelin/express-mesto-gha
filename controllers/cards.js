@@ -13,23 +13,28 @@ module.exports.getCard = (req, res, next) => {
 
 module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
-  Cards.create({ name, link, owner: req.user._id })
-    .then((card) => {
-      res.status(200).send({ data: card });
+
+  Users.findById(req.user._id)
+    .then((user) => {
+      Cards.create({ name, link, owner: user })
+        .then((card) => {
+          res.status(200).send({ data: card });
+        })
+        .catch((err) => {
+          if (err.message === VALIDATION_ERROR) {
+            return next(new BadReqError('Переданы некорректные данные при создании карточки.'));
+          }
+          return next(err);
+        });
     })
-    .catch((err) => {
-      if (err.message === VALIDATION_ERROR) {
-        return next(new BadReqError('Переданы некорректные данные при создании карточки.'));
-      }
-      return next(err);
-    });
+    .catch(next);
 };
 
 module.exports.deleteCard = (req, res, next) => {
   Cards.findById(req.params.cardId)
     .orFail(new Error(NOT_FOUND))
     .then((card) => {
-      if (card.owner.toString() !== req.user._id) {
+      if (card.owner._id !== req.user._id) {
         return next(new ForbiddenError('У вас отсутствуют права для удаления карточки.'));
       }
       res.status(200).send({ data: card });

@@ -15,9 +15,8 @@ const cardSchema = new mongoose.Schema(
       validate: [isURL, 'Некорректный URL адрес.'],
     },
     owner: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'user',
-      required: true,
+      name: String,
+      _id: String,
     },
     likes: [
       {
