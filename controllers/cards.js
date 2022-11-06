@@ -1,4 +1,5 @@
 const Cards = require('../models/cards');
+const Users = require('../models/users');
 const { NOT_FOUND, CAST_ERROR, VALIDATION_ERROR } = require('../constants');
 const BadReqError = require('../errors/BadReqError');
 const ForbiddenError = require('../errors/ForbiddenError');
@@ -46,24 +47,37 @@ module.exports.deleteCard = (req, res, next) => {
 };
 
 module.exports.likeCard = (req, res, next) => {
-  Cards.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user } }, { new: true })
-    .orFail(new Error(NOT_FOUND))
-    .then((card) => {
-      res.status(200).send(card);
+  Users.findById(req.user._id)
+    .then((user) => {
+      const { name, _id } = user;
+      Cards.findByIdAndUpdate(
+        req.params.cardId,
+        { $addToSet: { likes: { name, _id } } },
+        { new: true },
+      )
+        .orFail(new Error(NOT_FOUND))
+        .then((card) => {
+          res.status(200).send(card);
+        })
+        .catch((err) => {
+          if (err.name === CAST_ERROR) {
+            next(new BadReqError('Переданы некорректные данные для постановки лайка.'));
+          }
+          if (err.message === NOT_FOUND) {
+            return next(new NotFoundError('Передан несуществующий _id карточки.'));
+          }
+          return next(err);
+        });
     })
-    .catch((err) => {
-      if (err.name === CAST_ERROR) {
-        next(new BadReqError('Переданы некорректные данные для постановки лайка.'));
-      }
-      if (err.message === NOT_FOUND) {
-        return next(new NotFoundError('Передан несуществующий _id карточки.'));
-      }
-      return next(err);
-    });
+    .catch(next);
 };
 
 module.exports.dislikeCard = (req, res, next) => {
-  Cards.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user } }, { new: true })
+  Cards.findByIdAndUpdate(
+    req.params.cardId,
+    { $pull: { likes: { _id: req.user._id } } },
+    { new: true },
+  )
     .orFail(new Error(NOT_FOUND))
     .then((card) => {
       res.status(200).send(card);
