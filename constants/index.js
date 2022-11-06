@@ -8,6 +8,8 @@ const allowedCors = [
   'https://amelin.mesto.backend.nomoredomains.icu',
   'http://amelin.mesto.nomoredomains.icu,',
   'http://amelin.mesto.backend.nomoredomains.icu',
+  'https://localhost:3000',
+  'http://localhost:3000',
 ];
 
 module.exports = {
