@@ -1,8 +1,4 @@
-const allowedCors = [
-  'https://amelin.mesto.nomoredomains.icu',
-  'http://amelin.mesto.nomoredomains.icu',
-  'localhost:3000',
-];
+const { allowedCors } = require('../constants');
 
 module.exports = (req, res, next) => {
   const { origin } = req.headers;
@@ -11,7 +7,6 @@ module.exports = (req, res, next) => {
   const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
   res.header('Access-Control-Allow-Credentials', true);
   if (allowedCors.includes(origin)) {
-    console.log(origin);
     res.header('Access-Control-Allow-Origin', origin);
   }
   if (method === 'OPTIONS') {
