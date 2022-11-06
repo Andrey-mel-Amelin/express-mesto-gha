@@ -18,7 +18,7 @@ module.exports.createCard = (req, res, next) => {
     .then((user) => {
       Cards.create({ name, link, owner: user })
         .then((card) => {
-          res.status(200).send({ data: card });
+          res.status(200).send(card);
         })
         .catch((err) => {
           if (err.message === VALIDATION_ERROR) {
