@@ -14,30 +14,6 @@ const BadReqError = require('../errors/BadReqError');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
-module.exports.login = (req, res, next) => {
-  const { email, password } = req.body;
-
-  return Users.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
-      res
-        .cookie('jwt', token, {
-          maxAge: 3600000 * 24 * 7,
-          httpOnly: true,
-          sameSite: 'None',
-          secure: true,
-        })
-        .status(200)
-        .send({ message: 'Пользователь успешно авторизирован.' });
-    })
-    .catch((err) => {
-      if (err.message === ERROR_EMAIL_OR_PASSWORD) {
-        return next(new UnauthorizedError(err.message));
-      }
-      return next(err);
-    });
-};
-
 module.exports.createUser = (req, res, next) => {
   const {
     email,
@@ -67,6 +43,38 @@ module.exports.createUser = (req, res, next) => {
       }
       return next(err);
     });
+};
+
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  return Users.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
+      res
+        .cookie('jwt', token, {
+          maxAge: 3600000 * 24 * 7,
+          httpOnly: true,
+          sameSite: 'None',
+          secure: true,
+        })
+        .status(200)
+        .send({ message: 'Пользователь успешно авторизирован.' });
+    })
+    .catch((err) => {
+      if (err.message === ERROR_EMAIL_OR_PASSWORD) {
+        return next(new UnauthorizedError(err.message));
+      }
+      return next(err);
+    });
+};
+
+module.exports.logout = (req, res, next) => {
+  Users.findById(req.user._id)
+    .then(() => {
+      res.cookie('jwt', '', { maxAge: -1 });
+    })
+    .catch(next);
 };
 
 module.exports.getUsers = (req, res, next) => {
