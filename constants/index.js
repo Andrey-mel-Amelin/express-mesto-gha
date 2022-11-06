@@ -6,11 +6,6 @@ const VALIDATION_ERROR = 'Validation failed';
 const allowedCors = [
   'https://amelin.mesto.nomoredomains.icu,',
   'https://amelin.mesto.backend.nomoredomains.icu,',
-  'http://amelin.mesto.nomoredomains.icu',
-  'http://amelin.mesto.backend.nomoredomains.icu',
-  'http://127.0.0.1/',
-  'http://localhost:3000/',
-  'localhost:3000',
 ];
 
 module.exports = {
