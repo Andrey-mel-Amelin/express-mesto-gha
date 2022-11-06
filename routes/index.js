@@ -10,6 +10,13 @@ const allowedCors = require('../middlewares/allowedCors');
 router.use(requestLogger);
 
 router.use(allowedCors);
+
+router.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
+
 router.post('/signin', validAuthName, login);
 router.post('/signup', validAuthName, createUser);
 router.use(auth);

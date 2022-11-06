@@ -5,7 +5,7 @@ const REGEX_URL = /https?:\/\/(www\.)?[-a-zA-Z0-9:%._~#=]{1,256}\.[a-zA-Z0-9()]{
 const VALIDATION_ERROR = 'Validation failed';
 const allowedCors = [
   'https://amelin.mesto.nomoredomains.icu,',
-  'https://amelin.mesto.backend.nomoredomains.icu,',
+  'amelin.mesto.backend.nomoredomains.icu',
 ];
 
 module.exports = {
