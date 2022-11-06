@@ -71,7 +71,15 @@ module.exports.login = (req, res, next) => {
 
 module.exports.logout = (req, res, next) => {
   Users.findById(req.user._id)
-    .then(() => res.cookie('jwt', '', { maxAge: -1 }).status(200).send({ message: 'Пользователь успешно вышел.' }))
+    .then(() => res
+      .cookie('jwt', '', {
+        maxAge: -1,
+        httpOnly: true,
+        sameSite: 'None',
+        secure: true,
+      })
+      .status(200)
+      .send({ message: 'Пользователь успешно вышел.' }))
     .catch(next);
 };
 
