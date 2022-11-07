@@ -4,7 +4,7 @@ const VALIDATION_ERROR = 'Validation failed';
 const allowedCors = [
   'https://amelin.mesto.nomoredomains.icu',
   'http://amelin.mesto.nomoredomains.icu',
-  'localhost:3000',
+  'http://localhost:3000',
 ];
 
 module.exports = {
