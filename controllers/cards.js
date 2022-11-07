@@ -75,7 +75,7 @@ module.exports.likeCard = (req, res, next) => {
 module.exports.dislikeCard = (req, res, next) => {
   Cards.findByIdAndUpdate(
     req.params.cardId,
-    { $pull: { likes: { _id: req.user._id } } },
+    { $pull: { likes: req.user._id } },
     { new: true },
   )
     .orFail(new NotFoundError('Передан несуществующий _id карточки.'))
