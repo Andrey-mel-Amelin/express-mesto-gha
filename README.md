@@ -1,12 +1,20 @@
-[![Tests for sprint 14](https://github.com/Andrey-mel-Amelin/express-mesto-gha/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/Andrey-mel-Amelin/express-mesto-gha/actions/workflows/tests-14-sprint.yml)
-
 # **Место Russia - бэкенд.**
-### **Технологии разработки :**
+
+## **Технологии разработки :**
 * express
 * mongoDB
 * JoiValidator
 * REGEX
 * Eslint
-___
 
-### **[Проект Яндекс.Практикум](https://practicum.yandex.ru/)**
+## **В проекте реализовано:**
+* _Создание нового пользователя_
+* _Авторизация пользователя_
+* _Получение списка пользователей_
+* _Изменение аватара/информации о пользователе_
+* _Получение массива карточек_
+* _Создание новых карточек_
+* _Лайк/дизлайк карточек_
+* _Удаление карточки_
+
+### **[front-end github link](https://github.com/Andrey-mel-Amelin/react-mesto-auth)**
